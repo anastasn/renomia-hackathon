@@ -1,0 +1,74 @@
+name: renomia-hackathon
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Development-only docker-compose.
+# For production, use a proper orchestrator (ECS, k8s, etc.).
+# ─────────────────────────────────────────────────────────────────────────────
+
+x-common: &common
+  restart: unless-stopped
+  env_file:
+    - .env
+
+services:
+  # ── Frontend ───────────────────────────────────────────────────────────────
+  frontend:
+    <<: *common
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # ── Backend ────────────────────────────────────────────────────────────────
+  backend:
+    <<: *common
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Hot-reload in development: mount source code
+      - ./services/backend:/app
+      # Persist SQLite database between restarts
+      - backend_data:/app/data
+    environment:
+      DEBUG: "true"
+      AI_ENGINE_URL: http://ai-engine:8001
+    depends_on:
+      ai-engine:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── AI Engine ──────────────────────────────────────────────────────────────
+  ai-engine:
+    <<: *common
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.ai-engine
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./services/ai-engine:/app
+      - ai_engine_data:/app/data
+    environment:
+      DEBUG: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  backend_data:
+  ai_engine_data:
