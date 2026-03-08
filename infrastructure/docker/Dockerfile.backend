@@ -1,20 +1,35 @@
-# syntax=docker/dockerfile:1
-FROM python:3.12-slim
+FROM python:3.13-slim-bookworm
 
-# Install uv
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Install dependencies first (cache layer)
-COPY services/backend/pyproject.toml .
-RUN uv pip install --system -e .
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PYTHON_PREFERENCE=only-managed
+ENV PYTHONUNBUFFERED=1
 
-# Copy source
-COPY services/backend .
+COPY pyproject.toml uv.lock ./
+COPY packages/ai/pyproject.toml ./packages/ai/
+COPY services/backend/pyproject.toml ./services/backend/
 
-# Ensure data directory exists
-RUN mkdir -p data
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-workspace --no-dev --package backend
 
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY packages/ai ./packages/ai
+COPY services/backend ./services/backend
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --package backend
+
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app/services/backend/src
+
+WORKDIR /app/services/backend
+
+EXPOSE 5001
+
+CMD ["uv", "run", "uvicorn", "renomia_backend.main:app", "--host", "0.0.0.0", "--port", "5001"]

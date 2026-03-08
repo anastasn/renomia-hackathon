@@ -1,0 +1,16 @@
+*.env*
+!*.env.example
+node_modules/
+dist/
+build/
+*__pycache__/
+*.log
+*.bak
+*.tmp
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sln
+*.suo

@@ -1,0 +1,25 @@
+[project]
+name = "renomia-ai"
+version = "0.1.0"
+description = "Shared code for Renomia AI services"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP"]
+ignore = ["E741", "N806"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+

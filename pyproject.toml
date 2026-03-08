@@ -1,0 +1,21 @@
+[project]
+name = "renomia-hackathon"
+version = "0.1.0"
+description = ""
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[tool.uv]
+managed = true
+package = false
+
+[tool.uv.workspace]
+members = [
+    "services/*",
+    "packages/*",
+]
+
+[tool.uv.sources]
+renomia-ai = { workspace = true, editable = true }
+

@@ -40,18 +40,18 @@ setup-ai-engine:
 
 dev:
 	@cp -n infrastructure/env/.env.example .env 2>/dev/null || true
-	docker compose up --build
+	docker compose up 
 
 dev-local: dev-backend dev-ai-engine dev-frontend
 
 dev-frontend:
-	npm run dev:frontend
+	npm run dev &
 
 dev-backend:
-	cd services/backend && $(UV) run uvicorn app.main:app --reload --port 8000
+	cd services/backend && $(UV) run uvicorn renomia_backend.main:app --reload --port 5001 &
 
 dev-ai-engine:
-	cd services/ai-engine && $(UV) run uvicorn app.main:app --reload --port 8001
+	cd services/ai-engine && $(UV) run uvicorn ai_engine.main:app --reload --port 5002 &
 
 stop:
 	docker compose down
