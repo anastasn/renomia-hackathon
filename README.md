@@ -17,15 +17,15 @@ renomia-hackathon/
 │           └── lib/api.ts      # Typed backend API client
 │
 ├── services/
-│   ├── backend/                # FastAPI + SQLite + SQLAlchemy  (port 8000)
-│   │   └── app/
-│   │       ├── routers/        # One file per feature area
+│   ├── backend/                # FastAPI + SQLite + SQLAlchemy  (port 5001)
+│   │   └── src/renomia_backend/
+│   │       ├── api/            # Routers (one file per feature area)
 │   │       ├── models.py       # ORM models
 │   │       ├── schemas.py      # Pydantic DTOs
 │   │       └── main.py
 │   │
-│   └── ai-engine/              # FastAPI + LangGraph + ChromaDB (port 8001)
-│       └── app/
+│   └── ai-engine/              # FastAPI + LangGraph + ChromaDB (port 5002)
+│       └── src/ai_engine/
 │           ├── chains/         # ← implement AI logic here
 │           ├── vectorstore.py  # ChromaDB client factory
 │           └── main.py
@@ -38,14 +38,10 @@ renomia-hackathon/
 │   └── env/
 │       └── .env.example        # Environment variable template
 │
-├── scripts/
-│   └── dev-setup.sh            # One-shot bootstrap script
-│
-├── docs/
-│   └── architecture.md         # System design overview
-│
 ├── docker-compose.yml          # Development orchestration
-└── Makefile                    # Developer shortcuts
+├── Makefile                    # Developer shortcuts
+├── CLAUDE.md                   # Guide for AI coding agents
+└── ARCHITECTURE.md             # Full system design reference
 ```
 
 ---
@@ -67,10 +63,10 @@ make dev
 
 Services will be available at:
 - Frontend → http://localhost:3000
-- Backend API → http://localhost:8000
-- Backend docs → http://localhost:8000/docs
-- AI Engine → http://localhost:8001
-- AI Engine docs → http://localhost:8001/docs
+- Backend API → http://localhost:5001
+- Backend docs → http://localhost:5001/docs
+- AI Engine → http://localhost:5002
+- AI Engine docs → http://localhost:5002/docs
 
 ### Option B — Local (faster iteration, no Docker)
 
@@ -106,7 +102,7 @@ make dev-frontend     # terminal 3
 
 ### 1. RAG pipeline
 
-Open `services/ai-engine/app/chains/rag_chain.py` and implement `run_rag_chain()`.
+Open `services/ai-engine/src/ai_engine/chains/` and implement your chain logic.
 
 Steps:
 1. Uncomment the AI dependencies in `services/ai-engine/pyproject.toml`
@@ -116,12 +112,12 @@ Steps:
 
 ### 2. Document ingestion
 
-The `/ingest` endpoint in `services/ai-engine/app/main.py` is a stub.
+The `/ingest` endpoint in `services/ai-engine/src/ai_engine/main.py` is a stub.
 Implement text chunking, embedding, and ChromaDB upsert there.
 
 ### 3. Vectorstore
 
-`services/ai-engine/app/vectorstore.py` has a commented-out example.
+`services/ai-engine/src/ai_engine/vectorstore.py` has a commented-out example.
 Uncomment and adapt it once chromadb is installed.
 
 ---
@@ -164,3 +160,13 @@ Key variables:
 | Python tooling | uv, ruff, mypy, pytest |
 | Node tooling | npm workspaces, TypeScript, ESLint |
 | Infrastructure | Docker, docker-compose |
+
+---
+
+## For AI agents
+
+This repository includes authoritative documentation for AI coding assistants:
+
+- **`CLAUDE.md`** — commands, code style rules, DOs/DON'Ts, service map (start here)
+- **`AGENTS.md`** — same content, for editors that read AGENTS.md (Cursor, Zed)
+- **`ARCHITECTURE.md`** — full system design, data flow, network topology, tech stack table
