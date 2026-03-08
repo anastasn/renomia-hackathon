@@ -4,7 +4,7 @@
  * In production, set NEXT_PUBLIC_API_URL in your environment.
  */
 
- const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+ const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5001";
 
 export interface HealthResponse {
   status: string;
@@ -13,6 +13,7 @@ export interface HealthResponse {
 }
 
 export async function fetchHealth(): Promise<HealthResponse> {
+  console.debug(`Fetching health from ${BACKEND_URL}/api/health`);
   const res = await fetch(`${BACKEND_URL}/api/health`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Backend returned ${res.status}`);
   return res.json() as Promise<HealthResponse>;

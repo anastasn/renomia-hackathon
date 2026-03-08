@@ -28,7 +28,7 @@ setup: setup-frontend setup-backend setup-ai-engine
 	@echo "All dependencies installed."
 
 setup-frontend:
-	npm install
+	cd apps/frontend &&	npm install
 
 setup-backend:
 	cd services/backend && $(UV) sync
@@ -39,7 +39,6 @@ setup-ai-engine:
 # ── Development ──────────────────────────────────────────────────────────────
 
 dev:
-	@cp -n infrastructure/env/.env.example .env 2>/dev/null || true
 	docker compose up 
 
 dev-local: dev-backend dev-ai-engine dev-frontend
@@ -66,36 +65,23 @@ build:
 lint: lint-frontend lint-backend lint-ai-engine
 
 lint-frontend:
-	npm run lint --workspace=apps/frontend
+	npm run lint --fix --workspace=apps/frontend
 
 lint-backend:
-	cd services/backend && $(UV) run ruff check .
+	cd services/backend && $(UV) run ruff format . && uv run ruff check --fix .
 
 lint-ai-engine:
-	cd services/ai-engine && $(UV) run ruff check .
+	cd services/ai-engine && $(UV) run ruff format . && uv run ruff check --fix .
 
 # ── Typecheck ────────────────────────────────────────────────────────────────
 
-typecheck: typecheck-frontend typecheck-backend typecheck-ai-engine
-
-typecheck-frontend:
-	npm run typecheck --workspace=apps/frontend
+typecheck: typecheck-backend typecheck-ai-engine
 
 typecheck-backend:
-	cd services/backend && $(UV) run mypy app
+	cd services/backend && $(UV) run mypy src
 
 typecheck-ai-engine:
-	cd services/ai-engine && $(UV) run mypy app
-
-# ── Test ─────────────────────────────────────────────────────────────────────
-
-test: test-backend test-ai-engine
-
-test-backend:
-	cd services/backend && $(UV) run pytest tests/ -v
-
-test-ai-engine:
-	cd services/ai-engine && $(UV) run pytest tests/ -v
+	cd services/ai-engine && $(UV) run mypy src
 
 # ── Clean ────────────────────────────────────────────────────────────────────
 

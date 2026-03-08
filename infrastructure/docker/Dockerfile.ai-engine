@@ -1,20 +1,35 @@
-# syntax=docker/dockerfile:1
-FROM python:3.12-slim
+FROM python:3.13-slim-bookworm
 
-# Install uv
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Install dependencies first (cache layer)
-COPY services/ai-engine/pyproject.toml .
-RUN uv pip install --system -e .
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PYTHON_PREFERENCE=only-managed
+ENV PYTHONUNBUFFERED=1
 
-# Copy source
-COPY services/ai-engine .
+COPY pyproject.toml uv.lock ./
+COPY packages/ai/pyproject.toml ./packages/ai/
+COPY services/ai-engine/pyproject.toml ./services/ai-engine/
 
-# Ensure data directories exist
-RUN mkdir -p data/chroma
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-install-workspace --no-dev --package ai-engine
 
-EXPOSE 8001
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+COPY packages/ai ./packages/ai
+COPY services/ai-engine ./services/ai-engine
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --package ai-engine
+
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app/services/ai-engine/src
+
+WORKDIR /app/services/ai-engine
+
+EXPOSE 5002
+
+CMD ["uv", "run", "uvicorn", "ai_engine.main:app", "--host", "0.0.0.0", "--port", "5002", "--reload"]

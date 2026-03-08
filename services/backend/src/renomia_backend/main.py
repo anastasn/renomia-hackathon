@@ -1,12 +1,12 @@
-from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from renomia_backend.api.router import api_router
 from renomia_backend.config import settings
 from renomia_backend.database import create_tables
-from renomia_backend.api.router import api_router
 
 
 @asynccontextmanager
@@ -36,4 +36,4 @@ app.include_router(api_router)
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0", port=5001, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=5001, reload=True)

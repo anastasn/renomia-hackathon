@@ -9,10 +9,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from renomia_backend.database import Base
 
-
 # ---------------------------------------------------------------------------
 # Example model — replace or extend with your domain entities
 # ---------------------------------------------------------------------------
+
 
 class Document(Base):
     """Placeholder model representing an ingested document."""

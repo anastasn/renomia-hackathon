@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,13 +11,13 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # SQLite database path (relative to the service root)
-    database_url: str = "sqlite+aiosqlite:///./data/db.sqlite3"
+    database_url: str = os.getenv("DATABASE_URL", "sqlite:///./data/db.sqlite3")
 
     # URL of the AI engine service
-    ai_engine_url: str = "http://ai-engine:8001"
+    ai_engine_url: str = os.getenv("AI_ENGINE_URL", "http://localhost:5002")
 
     # CORS: comma-separated list of allowed origins
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = os.getenv("CORS_ORIGINS", "http://localhost:3000")
 
     @property
     def cors_origins_list(self) -> list[str]:

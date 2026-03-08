@@ -2,10 +2,10 @@
 
 from pydantic import BaseModel, ConfigDict
 
-
 # ---------------------------------------------------------------------------
 # Health
 # ---------------------------------------------------------------------------
+
 
 class ServiceStatus(BaseModel):
     status: str
@@ -16,6 +16,7 @@ class ServiceStatus(BaseModel):
 # ---------------------------------------------------------------------------
 # Document — example CRUD schemas
 # ---------------------------------------------------------------------------
+
 
 class DocumentCreate(BaseModel):
     title: str
@@ -35,6 +36,7 @@ class DocumentRead(BaseModel):
 # ---------------------------------------------------------------------------
 # AI Engine passthrough
 # ---------------------------------------------------------------------------
+
 
 class QueryRequest(BaseModel):
     query: str

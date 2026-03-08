@@ -14,9 +14,9 @@ Example:
         return Chroma(client=client, embedding_function=embeddings, collection_name="docs")
 """
 
-# from app.config import settings
 
-
-def get_vectorstore() -> None:  # type: ignore[return]
+def get_vectorstore() -> None:  
     """Placeholder — replace return type and body when ChromaDB is enabled."""
-    raise NotImplementedError("ChromaDB is not configured yet. See vectorstore.py for instructions.")
+    raise NotImplementedError(
+        "ChromaDB is not configured yet. See vectorstore.py for instructions."
+    )
