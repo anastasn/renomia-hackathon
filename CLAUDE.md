@@ -106,15 +106,15 @@ services/ai-engine/src/ai_engine/
 
 ---
 
-## AI engine setup (before implementing AI logic)
+## AI engine setup
 
-1. Uncomment the AI deps in `services/ai-engine/pyproject.toml`:
-   ```
-   langchain, langgraph, langchain-openai, langchain-chroma, chromadb, tiktoken
-   ```
-2. Run `make setup-ai-engine` (or `make setup`)
-3. Set `OPENAI_API_KEY` (or equivalent) in `.env`
-4. Implement chains in `services/ai-engine/src/ai_engine/chains/`
+`chromadb`, `langchain`, `langchain-openai`, and `langchain-chroma` are now **active**.
+`langgraph` and `tiktoken` remain commented — uncomment when needed.
+
+1. Run `make setup-ai-engine` (or `make setup`) to install deps
+2. Set `OPENAI_API_KEY` in `.env` (required for ingest/query; health works without it)
+3. Extend chains in `services/ai-engine/src/ai_engine/chains/`
+4. See `services/ai-engine/CLAUDE.md` for LLM synthesis instructions
 5. Move shared utilities to `packages/ai/src/renomia_ai/`
 
 ---

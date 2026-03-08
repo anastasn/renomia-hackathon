@@ -2,7 +2,7 @@
 name = "renomia-ai"
 version = "0.1.0"
 description = "Shared code for Renomia AI services"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
 ]
 
@@ -12,7 +12,7 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 120
-target-version = "py313"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP"]

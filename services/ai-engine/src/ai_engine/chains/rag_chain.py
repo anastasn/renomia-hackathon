@@ -1,31 +1,24 @@
-"""
-RAG chain placeholder.
-
-Replace the stub below with a real LangGraph / LangChain pipeline.
-
-Example flow (uncomment dependencies in pyproject.toml first):
-
-    from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-    from langchain_chroma import Chroma
-    from langgraph.graph import StateGraph
-
-Steps to implement:
-    1. Load ChromaDB vectorstore (see vectorstore.py).
-    2. Retrieve top-k chunks relevant to the user query.
-    3. Pass chunks + query to an LLM for answer synthesis.
-    4. Return structured QueryResponse.
-"""
+"""RAG chain — retrieval only (no LLM synthesis yet)."""
 
 from ai_engine.schemas import QueryRequest, QueryResponse
+from ai_engine.vectorstore import get_vectorstore
 
 
 async def run_rag_chain(request: QueryRequest) -> QueryResponse:
-    """
-    Stub implementation — returns a placeholder answer.
-    Replace with your LangGraph pipeline.
-    """
-    # TODO: implement real RAG logic
-    return QueryResponse(
-        answer=f"[STUB] Query received: '{request.query}'. Implement run_rag_chain() to add AI.",
-        sources=[],
-    )
+    """Retrieve top-k chunks from ChromaDB and return them directly."""
+    docs = get_vectorstore(request.collection).similarity_search(request.query, k=request.top_k)
+
+    if not docs:
+        return QueryResponse(answer="No relevant documents found.", sources=[])
+
+    # TODO: pipe `docs` + `request.query` through an LLM to synthesise an answer
+    answer = "\n\n---\n\n".join(doc.page_content for doc in docs)
+    seen: set[str] = set()
+    sources: list[str] = []
+    for doc in docs:
+        src = doc.metadata.get("source", "")
+        if src and src not in seen:
+            seen.add(src)
+            sources.append(src)
+
+    return QueryResponse(answer=answer, sources=sources)
